@@ -11,7 +11,7 @@ class CartService:
     """
     Servicio para interactuar con el carrito del usuario en el backend principal
     """
-    @staticmethod
+      @staticmethod
     def get_cart(user_token):
         """
         Obtiene el carrito del usuario desde el backend principal
@@ -54,8 +54,7 @@ class CartService:
             else:
                 headers = {"Authorization": f"Token {user_token}"}
                 logger.info("Usando formato de token clásico")
-            
-            logger.info(f"Consultando carrito en: {url} con token: {user_token[:5]}...")
+              logger.info(f"Consultando carrito en: {url} con token: {user_token[:5]}...")
             response = requests.get(url, headers=headers, timeout=10)
             
             if response.status_code == 200:
@@ -79,8 +78,7 @@ class CartService:
         except Exception as e:
             logger.exception(f"Error al consultar el carrito: {str(e)}")
             return None
-    
-    @staticmethod
+      @staticmethod
     def confirm_order(user_token, payment_id):
         """
         Confirma el pedido en el backend principal
@@ -153,8 +151,7 @@ class MercadoPagoService:
         except Exception as e:
             logger.exception(f"Error al crear preferencia de pago: {str(e)}")
             return None
-    
-    def process_cart_to_items(self, cart_data):
+      def process_cart_to_items(self, cart_data):
         """
         Procesa los datos del carrito y los convierte al formato requerido por Mercado Pago
         """

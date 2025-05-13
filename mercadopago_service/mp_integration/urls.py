@@ -16,7 +16,6 @@ Including another URLconf
 """
 from django.urls import path, include
 from django.http import JsonResponse
-from payment_service.views import PaymentRequestDetailView
 
 def health_check(request):
     """
@@ -27,5 +26,4 @@ def health_check(request):
 urlpatterns = [
     path('payment/', include('payment_service.urls')),
     path('health/', health_check, name='health-check'),
-    path('request/<uuid:pk>/', PaymentRequestDetailView.as_view(), name='payment-request-detail'),
 ]
