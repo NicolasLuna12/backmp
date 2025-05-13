@@ -1,0 +1,92 @@
+{
+  "info": {
+    "name": "Mercado Pago Integration API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "description": "Colección de Postman para probar la API de integración con Mercado Pago"
+  },
+  "item": [
+    {
+      "name": "Health Check",
+      "request": {
+        "method": "GET",
+        "url": {
+          "raw": "{{base_url}}/health/",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "health",
+            ""
+          ]
+        },
+        "description": "Endpoint para verificar si el servicio está funcionando"
+      },
+      "response": []
+    },
+    {
+      "name": "Crear Preferencia de Pago",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"user_token\": \"tu-token-de-usuario\",\n  \"email\": \"usuario@ejemplo.com\"\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/payment/create-preference/",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "payment",
+            "create-preference",
+            ""
+          ]
+        },
+        "description": "Endpoint para crear una preferencia de pago en Mercado Pago"
+      },
+      "response": []
+    },
+    {
+      "name": "Webhook (Para Mercado Pago)",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"topic\": \"payment\",\n  \"id\": \"12345678\"\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/payment/webhook/",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "payment",
+            "webhook",
+            ""
+          ]
+        },
+        "description": "Endpoint para recibir notificaciones (webhook) de Mercado Pago"
+      },
+      "response": []
+    }
+  ],
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:8000",
+      "type": "string"
+    }
+  ]
+}
