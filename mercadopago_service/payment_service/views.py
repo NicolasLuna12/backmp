@@ -234,8 +234,8 @@ class PaymentSuccessView(View):
                 url = f"{settings.MAIN_BACKEND_URL}/appCART/ticket/{external_reference}/"
                 resp = requests.get(url, timeout=10)
                 if resp.status_code == 200:
-                    # Redirigir al frontend local con el ID de la orden
-                    return redirect(f"http://localhost:4200/exito?id={external_reference}")
+                    # Redirigir al frontend local solo a /exito
+                    return redirect("http://localhost:4200/exito")
                 else:
                     logger.error(f"No se pudo obtener el ticket del backend principal: {resp.status_code} - {resp.text}")
                     return redirect("http://localhost:4200/error")
