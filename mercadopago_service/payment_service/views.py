@@ -5,6 +5,9 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from django.conf import settings
 from django.http import HttpResponse
+from django.shortcuts import redirect
+from django.views import View
+from django.http import HttpRequest
 
 from .models import PaymentRequest, PaymentNotification
 from .serializers import (
@@ -216,3 +219,20 @@ class WebhookView(APIView):
             
         except Exception as e:
             logger.exception(f"Error al procesar notificación de pago: {str(e)}")
+
+class PaymentSuccessView(View):
+    """
+    Vista para manejar la URL de éxito de Mercado Pago y redirigir al frontend con el ticket
+    """
+    def get(self, request: HttpRequest):
+        external_reference = request.GET.get('external_reference')
+        payment_id = request.GET.get('payment_id')
+        # Buscar el PaymentRequest correspondiente
+        payment_request_id = external_reference
+        if payment_request_id:
+            logger.info(f"Redirigiendo a ticket del frontend para PaymentRequest {payment_request_id}")
+            # Redirigir al frontend con el ID de la orden
+            return redirect(f"http://localhost:4200/ticket/{payment_request_id}")
+        else:
+            logger.error("No se encontró external_reference en la URL de éxito")
+            return redirect("http://localhost:4200/error")
