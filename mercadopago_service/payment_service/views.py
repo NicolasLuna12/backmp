@@ -3,6 +3,7 @@ from decimal import Decimal
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from rest_framework.generics import RetrieveAPIView
 from django.conf import settings
 from django.http import HttpResponse
 
@@ -216,3 +217,7 @@ class WebhookView(APIView):
             
         except Exception as e:
             logger.exception(f"Error al procesar notificación de pago: {str(e)}")
+
+class PaymentRequestDetailView(RetrieveAPIView):
+    queryset = PaymentRequest.objects.all()
+    serializer_class = PaymentRequestSerializer
