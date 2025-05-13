@@ -126,9 +126,9 @@ class MercadoPagoService:
                 "items": items,
                 "external_reference": str(external_reference),
                 "back_urls": {
-                    "success": f"{settings.MAIN_BACKEND_URL}/payment/success",
-                    "failure": f"{settings.MAIN_BACKEND_URL}/payment/failure",
-                    "pending": f"{settings.MAIN_BACKEND_URL}/payment/pending"
+                    "success": "https://ispcfood.netlify.app/exito",
+                    "failure": "https://ispcfood.netlify.app/error",
+                    "pending": "https://ispcfood.netlify.app/pendiente"
                 },
                 "auto_return": "approved"
             }
