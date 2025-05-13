@@ -11,47 +11,89 @@ class CartService:
     """
     Servicio para interactuar con el carrito del usuario en el backend principal
     """
-    @staticmethod
+      @staticmethod
     def get_cart(user_token):
         """
         Obtiene el carrito del usuario desde el backend principal
         """
         try:
+            # Validación básica del token
+            if not user_token:
+                logger.error("Token de usuario vacío o no proporcionado")
+                return None
+            
+            # Modo de prueba para debugging
+            if settings.DEBUG and "test" in user_token.lower():
+                logger.info(f"Usando datos de prueba para el carrito con token: {user_token[:10]}...")
+                return {
+                    "productos": [
+                        {
+                            "id": 1,
+                            "nombre": "Producto de Prueba 1",
+                            "descripcion": "Descripción del producto 1",
+                            "precio": 100.50,
+                            "cantidad": 2
+                        },
+                        {
+                            "id": 2,
+                            "nombre": "Producto de Prueba 2",
+                            "descripcion": "Descripción del producto 2",
+                            "precio": 200.75,
+                            "cantidad": 1
+                        }
+                    ],
+                    "total": 401.75
+                }
+            
             url = f"{settings.MAIN_BACKEND_URL}/appCART/ver/"
-            headers = {"Authorization": f"Token {user_token}"}
             
-            logger.info(f"Consultando carrito en: {url} con token: {user_token[:5]}...")
-            
-            # Log más detallado de la petición
-            logger.info(f"URL completa: {url}")
-            logger.info(f"Headers: {headers}")
-            
+            # Determinar el formato del token (JWT o Token clásico)
+            if user_token.startswith('eyJ'):  # Formato típico de JWT
+                headers = {"Authorization": f"Bearer {user_token}"}
+                logger.info("Usando formato de token JWT (Bearer)")
+            else:
+                headers = {"Authorization": f"Token {user_token}"}
+                logger.info("Usando formato de token clásico")
+              logger.info(f"Consultando carrito en: {url} con token: {user_token[:5]}...")
             response = requests.get(url, headers=headers, timeout=10)
             
-            # Log detallado de la respuesta
-            logger.info(f"Status code: {response.status_code}")
-            logger.info(f"Response headers: {response.headers}")
-            logger.info(f"Response content: {response.text[:200]}...")  # Primeros 200 caracteres
-            
             if response.status_code == 200:
-                cart_data = response.json()
-                logger.info(f"Carrito obtenido correctamente. Productos: {len(cart_data.get('productos', []))}")
-                return cart_data
+                response_data = response.json()
+                
+                # Si la respuesta es un array, convertirla al formato esperado
+                if isinstance(response_data, list):
+                    logger.info(f"Respuesta en formato de lista con {len(response_data)} productos")
+                    cart_data = {
+                        "productos": response_data,
+                        "total": sum(float(item.get("precio", 0)) * int(item.get("cantidad", 0)) for item in response_data)
+                    }
+                    logger.info(f"Carrito convertido a formato interno con total: {cart_data['total']}")
+                    return cart_data
+                else:
+                    logger.info(f"Respuesta en formato de objeto")
+                    return response_data
             else:
                 logger.error(f"Error al obtener el carrito: {response.status_code} - {response.text}")
                 return None
         except Exception as e:
             logger.exception(f"Error al consultar el carrito: {str(e)}")
             return None
-    
-    @staticmethod
+      @staticmethod
     def confirm_order(user_token, payment_id):
         """
         Confirma el pedido en el backend principal
         """
         try:
             url = f"{settings.MAIN_BACKEND_URL}/appCART/confirmar/"
-            headers = {"Authorization": f"Token {user_token}"}
+            
+            # Determinar el formato del token (JWT o Token clásico)
+            if user_token.startswith('eyJ'):  # Formato típico de JWT
+                headers = {"Authorization": f"Bearer {user_token}"}
+                logger.info("Usando formato de token JWT (Bearer) para confirmar pedido")
+            else:
+                headers = {"Authorization": f"Token {user_token}"}
+                logger.info("Usando formato de token clásico para confirmar pedido")
+                
             data = {"payment_id": payment_id}
             
             logger.info(f"Confirmando pedido en: {url}")
@@ -109,35 +151,47 @@ class MercadoPagoService:
         except Exception as e:
             logger.exception(f"Error al crear preferencia de pago: {str(e)}")
             return None
-    
-    def process_cart_to_items(self, cart_data):
+      def process_cart_to_items(self, cart_data):
         """
         Procesa los datos del carrito y los convierte al formato requerido por Mercado Pago
         """
         try:
-            if not cart_data or not isinstance(cart_data, dict):
-                logger.error("Datos del carrito inválidos")
+            if not cart_data:
+                logger.error("Datos del carrito inválidos o vacíos")
                 return []
             
-            # Validar el formato del carrito según la estructura del backend principal
-            if "productos" not in cart_data:
-                logger.error("El carrito no contiene productos")
+            # Si es una lista (formato de array del backend principal)
+            if isinstance(cart_data, list):
+                items = []
+                for producto in cart_data:
+                    item = {
+                        "id": str(producto.get("id", "")),
+                        "title": producto.get("producto", "Producto"),
+                        "description": producto.get("imageURL", ""),
+                        "quantity": int(producto.get("cantidad", 1)),
+                        "unit_price": float(producto.get("precio", 0)),
+                        "currency_id": "ARS"  # Ajustar según el país
+                    }
+                    items.append(item)
+                return items
+            
+            # Si es un diccionario con "productos" (formato actual esperado)
+            elif isinstance(cart_data, dict) and "productos" in cart_data:
+                items = []
+                for producto in cart_data.get("productos", []):
+                    item = {
+                        "id": str(producto.get("id")),
+                        "title": producto.get("nombre", "Producto"),
+                        "description": producto.get("descripcion", ""),
+                        "quantity": int(producto.get("cantidad", 1)),
+                        "unit_price": float(producto.get("precio", 0)),
+                        "currency_id": "ARS"  # Ajustar según el país
+                    }
+                    items.append(item)
+                return items
+            else:
+                logger.error("Formato de carrito no reconocido")
                 return []
-            
-            items = []
-            for producto in cart_data.get("productos", []):
-                # Adaptar esto según la estructura real del backend principal
-                item = {
-                    "id": str(producto.get("id")),
-                    "title": producto.get("nombre", "Producto"),
-                    "description": producto.get("descripcion", ""),
-                    "quantity": int(producto.get("cantidad", 1)),
-                    "unit_price": float(producto.get("precio", 0)),
-                    "currency_id": "ARS"  # Ajustar según el país
-                }
-                items.append(item)
-            
-            return items
         except Exception as e:
             logger.exception(f"Error al procesar carrito a items: {str(e)}")
             return []

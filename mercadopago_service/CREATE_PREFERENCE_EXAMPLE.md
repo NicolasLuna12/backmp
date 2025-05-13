@@ -86,6 +86,20 @@ Si hay un problema al crear la preferencia en Mercado Pago:
 }
 ```
 
+### Modo de prueba
+En ambiente de desarrollo (cuando `DEBUG=True`), es posible usar un token de prueba para simular un carrito:
+
+Si el token contiene la palabra `test`, el servicio generará un carrito de prueba automáticamente:
+
+```json
+{
+  "user_token": "token_con_test_incluido",
+  "email": "prueba@ejemplo.com"
+}
+```
+
+Esto es útil para probar la integración sin necesidad de tener un carrito real en el backend principal.
+
 ## Ejemplo de implementación en JavaScript
 
 ```javascript

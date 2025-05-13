@@ -36,15 +36,20 @@ class CreatePreferenceView(APIView):
         email = serializer.validated_data.get('email')
         
         logger.info(f"Token recibido: {user_token[:10]}... (truncado por seguridad)")
-        
-        # Obtener datos del carrito
+          # Obtener datos del carrito
         cart_service = CartService()
         cart_data = cart_service.get_cart(user_token)
         
         if not cart_data:
-            logger.error(f"No se pudo obtener el carrito con el token proporcionado")
+            logger.error(f"No se pudo obtener el carrito con el token proporcionado: {user_token[:10]}...")
+            
+            # Proporcionar un mensaje más específico para ayudar en la resolución del problema
+            error_message = "No se pudo obtener el carrito o está vacío"
+            if settings.DEBUG:
+                error_message += ". Para pruebas, utiliza un token que contenga 'test' para generar un carrito de prueba, o proporciona un token válido de un usuario con sesión iniciada."
+            
             return Response(
-                {"error": "No se pudo obtener el carrito o está vacío"}, 
+                {"error": error_message}, 
                 status=status.HTTP_400_BAD_REQUEST
             )
         
