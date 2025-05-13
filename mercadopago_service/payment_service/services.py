@@ -11,7 +11,7 @@ class CartService:
     """
     Servicio para interactuar con el carrito del usuario en el backend principal
     """
-      @staticmethod
+    @staticmethod
     def get_cart(user_token):
         """
         Obtiene el carrito del usuario desde el backend principal
@@ -54,7 +54,7 @@ class CartService:
             else:
                 headers = {"Authorization": f"Token {user_token}"}
                 logger.info("Usando formato de token clásico")
-              logger.info(f"Consultando carrito en: {url} con token: {user_token[:5]}...")
+            logger.info(f"Consultando carrito en: {url} con token: {user_token[:5]}...")
             response = requests.get(url, headers=headers, timeout=10)
             
             if response.status_code == 200:
@@ -78,7 +78,8 @@ class CartService:
         except Exception as e:
             logger.exception(f"Error al consultar el carrito: {str(e)}")
             return None
-      @staticmethod
+
+    @staticmethod
     def confirm_order(user_token, payment_id):
         """
         Confirma el pedido en el backend principal
@@ -108,18 +109,16 @@ class CartService:
             logger.exception(f"Error al confirmar el pedido: {str(e)}")
             return False, {"error": str(e)}
 
-
 class MercadoPagoService:
     """
     Servicio para interactuar con la API de Mercado Pago
     """
-    
     def __init__(self):
         self.sdk = mercadopago.SDK(settings.MERCADOPAGO_ACCESS_TOKEN)
     
     def create_preference(self, items, external_reference, payer_email=None, notification_url=None):
         """
-        Crea una preferencia de pago en Mercado Pago
+        Crea una preferencia de pago en Mercado Pago y verifica que esté activa antes de devolver la URL
         """
         try:
             # Construir los datos de la preferencia
@@ -133,25 +132,38 @@ class MercadoPagoService:
                 },
                 "auto_return": "approved"
             }
-            
-            # Agregar URL de notificaciones (webhook) si está disponible
-            if notification_url:
+            # Solo agregar notification_url si es una URL pública válida (no localhost ni 127.0.0.1)
+            if notification_url and not (notification_url.startswith('http://127.0.0.1') or notification_url.startswith('http://localhost')):
                 preference_data["notification_url"] = notification_url
-            
+            else:
+                logger.info(f"No se envía notification_url a Mercado Pago por ser local: {notification_url}")
             # Agregar datos del comprador si están disponibles
             if payer_email:
                 preference_data["payer"] = {
                     "email": payer_email
                 }
-            
             logger.info(f"Creando preferencia de pago: {preference_data}")
             preference_response = self.sdk.preference().create(preference_data)
-            
-            return preference_response["response"]
+            logger.info(f"Respuesta cruda de Mercado Pago al crear preferencia: {preference_response}")
+            # Si hay error explícito, loguear y devolver None
+            if preference_response.get('status') != 201:
+                logger.error(f"Error al crear preferencia: status {preference_response.get('status')}, detalle: {preference_response.get('response')}")
+                return None
+            pref = preference_response["response"]
+            # Verificar estado de la preferencia SOLO si el campo status existe
+            pref_id = pref.get("id")
+            if pref_id:
+                status_resp = self.sdk.preference().get(pref_id)
+                status_value = status_resp["response"].get("status")
+                if status_value is not None and status_value != "active":
+                    logger.error(f"Preferencia {pref_id} no está activa: {status_value}")
+                    return None
+            return pref
         except Exception as e:
             logger.exception(f"Error al crear preferencia de pago: {str(e)}")
             return None
-      def process_cart_to_items(self, cart_data):
+
+    def process_cart_to_items(self, cart_data):
         """
         Procesa los datos del carrito y los convierte al formato requerido por Mercado Pago
         """
@@ -195,7 +207,7 @@ class MercadoPagoService:
         except Exception as e:
             logger.exception(f"Error al procesar carrito a items: {str(e)}")
             return []
-    
+
     def get_payment(self, payment_id):
         """
         Consulta el estado de un pago en Mercado Pago
