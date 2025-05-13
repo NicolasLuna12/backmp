@@ -1,0 +1,1 @@
+web: gunicorn mercadopago_service.mp_integration.wsgi
