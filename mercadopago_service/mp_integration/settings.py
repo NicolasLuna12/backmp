@@ -76,11 +76,11 @@ WSGI_APPLICATION = 'mp_integration.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': os.getenv('DB_NAME', 'railway'),
-        'USER': os.getenv('DB_USER', 'root'),
-        'PASSWORD': os.getenv('DB_PASSWORD', ''),
-        'HOST': os.getenv('DB_HOST', ''),
-        'PORT': os.getenv('DB_PORT', ''),
+        'NAME': 'railway',
+        'USER': 'root',
+        'PASSWORD': 'BGVqserZKnEpylRlbhwyQcgSmmoocqAt',
+        'HOST': 'shortline.proxy.rlwy.net',
+        'PORT': '45482',
         'OPTIONS': {
             'sql_mode': 'traditional',
         }
