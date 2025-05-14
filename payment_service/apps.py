@@ -3,4 +3,4 @@ from django.apps import AppConfig
 
 class PaymentServiceConfig(AppConfig):
     default_auto_field = 'django.db.models.BigAutoField'
-    name = 'mercadopago_service.payment_service'
+    name = 'payment_service'
