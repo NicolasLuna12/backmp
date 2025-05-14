@@ -152,11 +152,10 @@ class WebhookView(APIView):
         else:
             logger.error(f"Tipo de notificación no reconocido: {data}")
             return Response({"error": "Tipo de notificación no reconocido"}, status=status.HTTP_400_BAD_REQUEST)
-        
-        # Guardar la notificación en la base de datos
+          # Guardar la notificación en la base de datos
         notification = PaymentNotification.objects.create(
             topic=notification_type,
-            payment_id=resource_id,
+            payment_id=resource_id if notification_type == 'payment' else None,
             raw_data=data
         )
         

@@ -30,7 +30,7 @@ class PaymentNotification(models.Model):
     """
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     payment_request = models.ForeignKey(PaymentRequest, on_delete=models.CASCADE, null=True, blank=True, related_name="notifications")
-    payment_id = models.CharField(max_length=255, help_text="ID del pago en Mercado Pago")
+    payment_id = models.CharField(max_length=255, null=True, blank=True, help_text="ID del pago en Mercado Pago")
     topic = models.CharField(max_length=50, help_text="Tipo de notificación")
     raw_data = models.JSONField(help_text="Datos completos de la notificación")
     processed = models.BooleanField(default=False, help_text="Indica si la notificación ya fue procesada")
