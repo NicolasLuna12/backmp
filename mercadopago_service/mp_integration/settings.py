@@ -78,7 +78,6 @@ DATABASES = {
         'PORT': '45482',
         'OPTIONS': {
             'sql_mode': 'traditional',
-            'init_command': "SET sql_mode='STRICT_TRANS_TABLES'",
         }
     }
 }
