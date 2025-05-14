@@ -24,6 +24,6 @@ def health_check(request):
     return JsonResponse({"status": "ok", "service": "mercadopago-integration"})
 
 urlpatterns = [
-    path('payment/', include('payment_service.urls')),
+    path('payment/', include('mercadopago_service.payment_service.urls')),
     path('health/', health_check, name='health-check'),
 ]
