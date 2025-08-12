@@ -82,4 +82,4 @@ Las contribuciones son bienvenidas. Por favor, abre un issue o envía un pull re
 
 ## Licencia
 
-MIT
+Nicolas Luna
