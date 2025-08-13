@@ -44,20 +44,57 @@ mercadopago_service/
    cd backmp
    ```
 
-2. Instala las dependencias:
+2. Crea un entorno virtual (recomendado):
+   ```bash
+   python -m venv venv
+   # Windows
+   venv\Scripts\activate
+   # Linux/Mac
+   source venv/bin/activate
+   ```
+
+3. Instala las dependencias:
    ```bash
    pip install -r requirements.txt
    ```
 
-3. Configura las variables de entorno necesarias en `mp_integration/settings.py` (API keys de MercadoPago, base de datos, etc).
+4. Configura las variables de entorno:
+   - Copia el archivo `.env.example` a `.env` en la carpeta `mercadopago_service/`
+   - Edita el archivo `.env` con tus credenciales reales
+   ```bash
+   cp .env.example mercadopago_service/.env
+   ```
+
+5. Ejecuta las migraciones:
+   ```bash
+   cd mercadopago_service
+   python manage.py migrate
+   ```
 
 ## Ejecución
 
 Para iniciar el servidor de desarrollo:
 
 ```bash
-python mercadopago_service/manage.py runserver
+cd mercadopago_service
+python manage.py runserver
 ```
+
+## Variables de Entorno
+
+El proyecto utiliza variables de entorno para proteger las credenciales sensibles. Configura las siguientes variables en tu archivo `.env`:
+
+- `DJANGO_SECRET_KEY`: Clave secreta de Django
+- `DJANGO_DEBUG`: Modo debug (True/False)
+- `DJANGO_ALLOWED_HOSTS`: Hosts permitidos separados por comas
+- `DB_ENGINE`: Motor de base de datos
+- `DB_NAME`: Nombre de la base de datos
+- `DB_USER`: Usuario de la base de datos
+- `DB_PASSWORD`: Contraseña de la base de datos
+- `DB_HOST`: Host de la base de datos
+- `DB_PORT`: Puerto de la base de datos
+- `MERCADOPAGO_ACCESS_TOKEN`: Token de acceso de MercadoPago
+- `MAIN_BACKEND_URL`: URL del backend principal
 
 ## Despliegue
 
@@ -75,6 +112,14 @@ python mercadopago_service/manage.py test
 
 - `/api/payments/` - Gestión de pagos.
 - `/api/notifications/` - Recepción de notificaciones de MercadoPago.
+
+## Seguridad
+
+- **Nunca** commitees el archivo `.env` al repositorio
+- Usa el archivo `.env.example` como plantilla para nuevas configuraciones
+- Cambia la `DJANGO_SECRET_KEY` en producción
+- Asegúrate de configurar `DEBUG=False` en producción
+- Restringe `ALLOWED_HOSTS` a los dominios específicos en producción
 
 ## Contribuciones
 

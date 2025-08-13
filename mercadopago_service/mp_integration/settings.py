@@ -21,7 +21,11 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 load_dotenv(os.path.join(BASE_DIR, '.env'))
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.getenv('DJANGO_SECRET_KEY', 'django-insecure-your-secret-key-for-development')
+SECRET_KEY = os.getenv('DJANGO_SECRET_KEY')
+
+# Verificar que la SECRET_KEY esté configurada
+if not SECRET_KEY:
+    raise ValueError("DJANGO_SECRET_KEY debe estar configurado en las variables de entorno")
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.getenv('DJANGO_DEBUG', 'True') == 'True'
@@ -75,15 +79,15 @@ WSGI_APPLICATION = 'mp_integration.wsgi.application'
 # Database
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'railway',
-        'USER': 'root',
-        'PASSWORD': 'BGVqserZKnEpylRlbhwyQcgSmmoocqAt',
-        'HOST': 'shortline.proxy.rlwy.net',
-        'PORT': '45482',
+        'ENGINE': os.getenv('DB_ENGINE', 'django.db.backends.sqlite3'),
+        'NAME': os.getenv('DB_NAME', BASE_DIR / 'db.sqlite3'),
+        'USER': os.getenv('DB_USER', ''),
+        'PASSWORD': os.getenv('DB_PASSWORD', ''),
+        'HOST': os.getenv('DB_HOST', ''),
+        'PORT': os.getenv('DB_PORT', ''),
         'OPTIONS': {
             'sql_mode': 'traditional',
-        }
+        } if os.getenv('DB_ENGINE') == 'django.db.backends.mysql' else {},
     }
 }
 
@@ -116,7 +120,11 @@ STATIC_URL = 'static/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # Configuración de Mercado Pago
-MERCADOPAGO_ACCESS_TOKEN = os.getenv('MERCADOPAGO_ACCESS_TOKEN', 'APP_USR-1638397842548868-051022-6da127c22d6d3b0e023d8ae29f3618c2-2435347984')
+MERCADOPAGO_ACCESS_TOKEN = os.getenv('MERCADOPAGO_ACCESS_TOKEN')
+
+# Verificar que el token de MercadoPago esté configurado
+if not MERCADOPAGO_ACCESS_TOKEN:
+    raise ValueError("MERCADOPAGO_ACCESS_TOKEN debe estar configurado en las variables de entorno")
 
 # URL del backend principal
 MAIN_BACKEND_URL = os.getenv('MAIN_BACKEND_URL', 'https://backmobile1.onrender.com')
