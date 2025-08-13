@@ -47,6 +47,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'mp_integration.security_middleware.SecurityMiddleware',  # Middleware personalizado
     'django.contrib.sessions.middleware.SessionMiddleware',
     'corsheaders.middleware.CorsMiddleware',  # Agregado CORS middleware
     'django.middleware.common.CommonMiddleware',
@@ -129,16 +130,21 @@ if not MERCADOPAGO_ACCESS_TOKEN:
 # URL del backend principal
 MAIN_BACKEND_URL = os.getenv('MAIN_BACKEND_URL', 'https://backmobile1.onrender.com')
 
-# Configuraciones CORS
-CORS_ALLOW_ALL_ORIGINS = True
+# Configuraciones CORS - IMPORTANTE: Restringe para producción
+CORS_ALLOW_ALL_ORIGINS = os.getenv('CORS_ALLOW_ALL_ORIGINS', 'True') == 'True'
+CORS_ALLOWED_ORIGINS = [
+    origin.strip() for origin in os.getenv('CORS_ALLOWED_ORIGINS', '').split(',')
+    if origin.strip()
+] if not CORS_ALLOW_ALL_ORIGINS else []
+
 CORS_ALLOW_CREDENTIALS = True
 CORS_ALLOW_METHODS = [
-    'DELETE',
     'GET',
-    'OPTIONS',
-    'PATCH',
     'POST',
     'PUT',
+    'PATCH',
+    'DELETE',
+    'OPTIONS'
 ]
 CORS_ALLOW_HEADERS = [
     'accept',
@@ -151,3 +157,38 @@ CORS_ALLOW_HEADERS = [
     'x-csrftoken',
     'x-requested-with',
 ]
+
+# Configuraciones de seguridad adicionales
+if not DEBUG:
+    SECURE_BROWSER_XSS_FILTER = True
+    SECURE_CONTENT_TYPE_NOSNIFF = True
+    X_FRAME_OPTIONS = 'DENY'
+    SECURE_HSTS_SECONDS = 31536000
+    SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+    SECURE_HSTS_PRELOAD = True
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True
+    SECURE_SSL_REDIRECT = True
+
+# Configuración de referrer policy para mayor seguridad
+SECURE_REFERRER_POLICY = 'same-origin'
+
+# Logging de requests no autorizados
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'file': {
+            'level': 'WARNING',
+            'class': 'logging.FileHandler',
+            'filename': 'security.log',
+        },
+    },
+    'loggers': {
+        'corsheaders': {
+            'handlers': ['file'],
+            'level': 'WARNING',
+            'propagate': True,
+        },
+    },
+}
