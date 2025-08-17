@@ -44,11 +44,27 @@ class SecurityMiddleware:
         response['X-Frame-Options'] = 'DENY'
         response['X-XSS-Protection'] = '1; mode=block'
         response['Referrer-Policy'] = 'same-origin'
-        # Content Security Policy para permitir MercadoPago .com y .com.ar
-        response['Content-Security-Policy'] = (
-            "frame-src 'self' https://www.mercadopago.com https://www.mercadopago.com.ar "
-            "https://www.mercadolibre.com https://mpago.la https://translate.google.com https://www.gstatic.com;"
-        )
+        # Content Security Policy para permitir MercadoPago en varios países
+        mercadopago_domains = [
+            "https://www.mercadopago.com",
+            "https://www.mercadopago.com.ar",
+            "https://www.mercadopago.com.mx",
+            "https://www.mercadopago.com.br",
+            "https://www.mercadopago.com.co",
+            "https://www.mercadopago.com.uy",
+            "https://www.mercadopago.cl",
+            "https://www.mercadopago.com.pe",
+            "https://www.mercadopago.com.ve",
+            "https://www.mercadopago.com.ec",
+            "https://www.mercadopago.com.pa",
+            "https://www.mercadopago.com.cr",
+            "https://www.mercadopago.com.do",
+            "https://www.mercadopago.com.py",
+            "https://www.mercadopago.com.gt",
+            "https://www.mercadopago.com.bo",
+        ]
+        csp_frame_src = "frame-src 'self' " + " ".join(mercadopago_domains) + " https://www.mercadolibre.com https://mpago.la https://translate.google.com https://www.gstatic.com;"
+        response['Content-Security-Policy'] = csp_frame_src
         return response
     
     def get_client_ip(self, request):
