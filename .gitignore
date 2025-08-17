@@ -75,3 +75,4 @@ static/
 
 # Configuraciones específicas del proyecto
 local_settings.py
+mercadopago_service/payment_service/migrations/0003_paymentrequest_order_confirmed.py
