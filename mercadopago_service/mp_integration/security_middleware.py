@@ -44,7 +44,11 @@ class SecurityMiddleware:
         response['X-Frame-Options'] = 'DENY'
         response['X-XSS-Protection'] = '1; mode=block'
         response['Referrer-Policy'] = 'same-origin'
-        
+        # Content Security Policy para permitir MercadoPago .com y .com.ar
+        response['Content-Security-Policy'] = (
+            "frame-src 'self' https://www.mercadopago.com https://www.mercadopago.com.ar "
+            "https://www.mercadolibre.com https://mpago.la https://translate.google.com https://www.gstatic.com;"
+        )
         return response
     
     def get_client_ip(self, request):
