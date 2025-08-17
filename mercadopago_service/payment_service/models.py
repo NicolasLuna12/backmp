@@ -7,7 +7,7 @@ class PaymentRequest(models.Model):
     Modelo para almacenar las solicitudes de pago y seguimiento
     """
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    user_token = models.CharField(max_length=255, help_text="Token de autenticación del usuario")
+    user_token = models.TextField(help_text="Token de autenticación del usuario")
     preference_id = models.CharField(max_length=255, null=True, blank=True, help_text="ID de la preferencia en Mercado Pago")
     init_point = models.URLField(null=True, blank=True, help_text="URL para redirigir al usuario para el pago")
     status = models.CharField(max_length=50, default="pending", help_text="Estado del pago")

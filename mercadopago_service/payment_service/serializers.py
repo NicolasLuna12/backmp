@@ -8,7 +8,7 @@ class PaymentRequestSerializer(serializers.ModelSerializer):
         read_only_fields = ['id', 'preference_id', 'init_point', 'status', 'total_amount', 'created_at']
 
 class CreatePreferenceSerializer(serializers.Serializer):
-    user_token = serializers.CharField(max_length=255, required=True,
+    user_token = serializers.CharField(required=True,
                                       help_text="Token de autenticación del usuario")
     email = serializers.EmailField(required=False, allow_blank=True,
                                   help_text="Email del usuario (opcional)")
