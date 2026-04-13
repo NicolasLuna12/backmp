@@ -31,6 +31,12 @@ if not SECRET_KEY:
 DEBUG = os.getenv('DJANGO_DEBUG', 'True') == 'True'
 
 ALLOWED_HOSTS = os.getenv('DJANGO_ALLOWED_HOSTS', '*').split(',')
+DEFAULT_ALLOWED_HOSTS = ['ispcfood.dev.ar', 'www.ispcfood.dev.ar']
+if '*' not in ALLOWED_HOSTS:
+    ALLOWED_HOSTS = [host.strip() for host in ALLOWED_HOSTS if host.strip()]
+    for host in DEFAULT_ALLOWED_HOSTS:
+        if host not in ALLOWED_HOSTS:
+            ALLOWED_HOSTS.append(host)
 
 # Application definition
 INSTALLED_APPS = [
@@ -136,6 +142,23 @@ CORS_ALLOWED_ORIGINS = [
     origin.strip() for origin in os.getenv('CORS_ALLOWED_ORIGINS', '').split(',')
     if origin.strip()
 ] if not CORS_ALLOW_ALL_ORIGINS else []
+
+DEFAULT_ALLOWED_ORIGINS = [
+    'https://ispcfood.dev.ar',
+    'https://www.ispcfood.dev.ar',
+]
+if not CORS_ALLOW_ALL_ORIGINS:
+    for origin in DEFAULT_ALLOWED_ORIGINS:
+        if origin not in CORS_ALLOWED_ORIGINS:
+            CORS_ALLOWED_ORIGINS.append(origin)
+
+CSRF_TRUSTED_ORIGINS = [
+    origin.strip() for origin in os.getenv('CSRF_TRUSTED_ORIGINS', '').split(',')
+    if origin.strip()
+]
+for origin in DEFAULT_ALLOWED_ORIGINS:
+    if origin not in CSRF_TRUSTED_ORIGINS:
+        CSRF_TRUSTED_ORIGINS.append(origin)
 
 CORS_ALLOW_CREDENTIALS = True
 CORS_ALLOW_METHODS = [

@@ -16,6 +16,10 @@ class SecurityMiddleware:
     ALLOWED_ORIGINS = [
         'https://ispcfood.netlify.app',
         'https://ispcfood.netlify.app/',
+        'https://ispcfood.dev.ar',
+        'https://ispcfood.dev.ar/',
+        'https://www.ispcfood.dev.ar',
+        'https://www.ispcfood.dev.ar/',
     ]
     
     def __init__(self, get_response):
